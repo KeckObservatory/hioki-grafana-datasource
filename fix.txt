@@ -1,0 +1,19 @@
+	if err := datasource.Manage("wmkeckobservatory-hioki-datasource", plugin.NewDatasource, datasource.ManageOpts{}); err != nil {
+./pkg/main.go
+    type: 'wmkeckobservatory-hioki-datasource'
+./provisioning/datasources/datasources.yml
+    container_name: 'wmkeckobservatory-hioki-datasource'
+      - ../dist:/var/lib/grafana/plugins/wmkeckobservatory-hioki-datasource
+      - ..:/root/wmkeckobservatory-hioki-datasource
+      GF_LOG_FILTERS: plugin.wmkeckobservatory-hioki-datasource:debug
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: wmkeckobservatory-hioki-datasource
+./.config/docker-compose-base.yaml
+command=bash -c 'while [ ! -f /root/wmkeckobservatory-hioki-datasource/dist/gpx_hioki* ]; do sleep 1; done; /run.sh'
+command=/bin/bash -c 'while inotifywait -e modify,create,delete -r /var/lib/grafana/plugins/wmkeckobservatory-hioki-datasource; do echo "Change detected, restarting delve...";supervisorctl restart delve; done'
+directory=/root/wmkeckobservatory-hioki-datasource
+command=/bin/bash -c 'git config --global --add safe.directory /root/wmkeckobservatory-hioki-datasource && mage -v watch'
+./.config/supervisord/supervisord.conf
+  "id": "wmkeckobservatory-hioki-datasource",
+./src/plugin.json
+          docker logs wmkeckobservatory-hioki-datasource >& grafana-server.log
+./.github/workflows/ci.yml
